@@ -29,6 +29,7 @@
         </div>
       </div>
     </div>
+    <span class="goTop" v-show="!isTop" @click="goTop">Top</span>
   </div>
 </template>
 
@@ -40,7 +41,8 @@ export default {
     return {
       bannerList: [],
       categoryList: [],
-      floorData: []
+      floorData: [],
+      isTop: true
     }
   },
   created () {
@@ -51,24 +53,42 @@ export default {
   },
   methods: {
     async getSwiper () {
-      const { message } = await request('https://www.zhengzhicheng.cn/api/public/v1/home/swiperdata')
+      const { message } = await request(
+        {url: '/api/public/v1/home/swiperdata'})
       this.bannerList = message
     },
     async getCategory() {
-      const { message } = await request('https://www.zhengzhicheng.cn/api/public/v1/home/catitems')
+      const { message } = await request(
+        {url: '/api/public/v1/home/catitems'})
       this.categoryList = message
     },
     async getfloor() {
-      const { message } = await request('https://www.zhengzhicheng.cn/api/public/v1/home/floordata')
+      const { message } = await request(
+        {url: '/api/public/v1/home/floordata'})
       this.floorData = message
-    }
+    },
+     goTop() {
+    console.log(111)
+    mpvue.pageScrollTo({
+      scrollTop: 0
+    })
+  }
   },
   onPullDownRefresh() {
     this.getSwiper()
     this.getCategory()
     this.getfloor()
     mpvue.stopPullDownRefresh()
+  },
+  // 上拉加载
+  onReachBotton() {
+
+  },
+  onPageScroll(ev) {
+    this.isTop = ev.scrollTop < 150
   }
+
+
 }
 </script>
 
@@ -137,5 +157,14 @@ export default {
         margin-right: 10rpx;
       }
     }
+}
+.goTop {
+  position: fixed;
+  bottom: 30rpx;
+  right: 14rpx;
+  background-color: rgba(255, 255, 255, 0.5);
+  height: 60rpx;
+  width: 60rpx;
+  border-radius: 30rpx;
 }
 </style>
