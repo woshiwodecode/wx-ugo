@@ -1,64 +1,31 @@
 <template>
   <div>
     <div class="search" >
-      <input type="text" placeholder="搜索">
+      <input type="text" placeholder="搜索"  placeholder-class="center">
     </div>
 
     <!-- 焦点图 -->
     <swiper class="banner" autoplay="true" circular="true" indicator-dots  indicator-color="rgba(255, 255, 255, 0.6)" indicator-active-color="#fff">
-      <swiper-item>
-        <image src="/static/uploads/banner1.png"></image>
-      </swiper-item>
-      <swiper-item>
-        <image src="/static/uploads/banner2.png"></image>
-      </swiper-item>
-      <swiper-item>
-        <image src="/static/uploads/banner3.png"></image>
+      <swiper-item v-for="(list, index) in bannerList" :key="index">
+        <image :src="list.image_src"></image>
       </swiper-item>
     </swiper>
     <!-- 导航条 -->
     <div class="nav">
-      <image src="/static/uploads/icon_index_nav_1@2x.png"></image>
-      <image src="/static/uploads/icon_index_nav_2@2x.png"></image>
-      <image src="/static/uploads/icon_index_nav_3@2x.png"></image>
-      <image src="/static/uploads/icon_index_nav_4@2x.png"></image>
+      <navigator v-for="(list, key) in categoryList" :key="key">
+        <image :src="list.image_src"></image>
+      </navigator>
+
     </div>
     <!-- 楼层 -->
     <div class="floors">
-      <div class="floor">
+      <div class="floor" v-for="(item, index) in floorData" :key="index">
         <div class="title">
-          <image src="/static/uploads/pic_floor01_title.png"></image>
+          <image :src="item.floor_title.image_src"></image>
         </div>
-        <div class="items">
-          <image src="/static/uploads/pic_floor01_1@2x.png"></image>
-          <image src="/static/uploads/pic_floor01_2@2x.png"></image>
-          <image src="/static/uploads/pic_floor01_3@2x.png"></image>
-          <image src="/static/uploads/pic_floor01_4@2x.png"></image>
-          <image src="/static/uploads/pic_floor01_5@2x.png"></image>
-        </div>
-      </div>
-      <div class="floor">
-        <div class="title">
-          <image src="/static/uploads/pic_floor02_title.png"></image>
-        </div>
-        <div class="items">
-          <image src="/static/uploads/pic_floor02_1@2x.png"></image>
-          <image src="/static/uploads/pic_floor02_2@2x.png"></image>
-          <image src="/static/uploads/pic_floor02_3@2x.png"></image>
-          <image src="/static/uploads/pic_floor02_4@2x.png"></image>
-          <image src="/static/uploads/pic_floor02_5@2x.png"></image>
-        </div>
-      </div>
-      <div class="floor">
-        <div class="title">
-          <image src="/static/uploads/pic_floor03_title.png"></image>
-        </div>
-        <div class="items">
-          <image src="/static/uploads/pic_floor03_1@2x.png"></image>
-          <image src="/static/uploads/pic_floor03_2@2x.png"></image>
-          <image src="/static/uploads/pic_floor03_3@2x.png"></image>
-          <image src="/static/uploads/pic_floor03_4@2x.png"></image>
-          <image src="/static/uploads/pic_floor03_5@2x.png"></image>
+        <div class="items" >
+          <image v-for="(list,k) in item.product_list" :key="k" :src="list.image_src"></image>
+
         </div>
       </div>
     </div>
@@ -66,16 +33,41 @@
 </template>
 
 <script>
-import card from '@/components/card'
+import request from '@/utils/request'
 
 export default {
   data () {
     return {
-
+      bannerList: [],
+      categoryList: [],
+      floorData: []
     }
   },
   created () {
     // let app = getApp()
+    this.getSwiper()
+    this.getCategory()
+    this.getfloor()
+  },
+  methods: {
+    async getSwiper () {
+      const { message } = await request('https://www.zhengzhicheng.cn/api/public/v1/home/swiperdata')
+      this.bannerList = message
+    },
+    async getCategory() {
+      const { message } = await request('https://www.zhengzhicheng.cn/api/public/v1/home/catitems')
+      this.categoryList = message
+    },
+    async getfloor() {
+      const { message } = await request('https://www.zhengzhicheng.cn/api/public/v1/home/floordata')
+      this.floorData = message
+    }
+  },
+  onPullDownRefresh() {
+    this.getSwiper()
+    this.getCategory()
+    this.getfloor()
+    mpvue.stopPullDownRefresh()
   }
 }
 </script>
@@ -90,11 +82,13 @@ export default {
   height: 60rpx;
   background-color: #fff;
   border-radius: 15rpx;
-  padding-left: 326rpx;
+  }
 
 }
+.center {
+    text-align: center;
+    font-size: 24rpx;
 }
-
 .banner {
     width: 100%;
     height: 340rpx;
